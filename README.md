@@ -1,52 +1,127 @@
-# Predicting Digital Dependency: A Data Mining Approach to Smartphone Addiction 
+# 📱 Smartphone Addiction Prediction
 
-## Project Overview
-In the modern digital era, smartphone addiction (nomophobia) has emerged as a significant psychological and behavioral concern. Excessive screen time, particularly on social media and gaming, is increasingly linked to poor sleep quality, elevated stress levels, and declining academic or professional performance. 
+> **Data Mining Project** — Predict smartphone addiction risk from usage behavior data.
 
-The goal of this project is to use data mining and machine learning techniques to identify the hidden patterns of smartphone usage that lead to addiction. By predicting an individual's addiction status based on their passive usage metrics, we aim to uncover insights that could power proactive digital well-being interventions.
+---
 
-## The Dataset
-The project utilizes a dataset of 7,500 anonymized user records. 
-* **Features:** 15 parameters including daily screen time, social media hours, gaming hours, sleep hours, daily notifications, app opens, stress levels, and academic/work impact.
-* **Target Variable:** `addicted_label` (Binary: 0 = Not Addicted, 1 = Addicted).
-* **Note:** The `addiction_level` feature is dropped during modeling to prevent data leakage.
+## 📁 Project Structure
 
-## Project Methodology
-This project strictly follows the **CRISP-DM** (Cross-Industry Standard Process for Data Mining) methodology:
-1. **Business Understanding:** Defining the problem and objectives.
-2. **Data Understanding:** Exploratory Data Analysis (EDA), covariance, and correlation analysis.
-3. **Data Preparation:** Data cleaning, handling categorical variables (One-Hot Encoding/Mapping), and feature scaling.
-4. **Modeling:** Training a **Logistic Regression** model for binary classification.
-5. **Evaluation:** Assessing the model using Accuracy, Precision, Recall, F1-Score, and Confusion Matrices.
-6. **Deployment:** Structuring the repository for reproducibility.
-
-## Repository Structure
-```text
+```
 phone-addiction-prediction/
-│
-├── data/                   # Contains the dataset (e.g., transaction_id.csv)
-├── docs/                   # Project reports, CRISP-DM plan, and presentation slides
-├── notebooks/              # Jupyter notebooks containing EDA, data cleaning, and ML models
-├── src/                    # Standalone Python scripts (if applicable)
-├── requirements.txt        # List of Python dependencies required to run the code
-└── README.md               # Project documentation
-Setup & Installation
-To run this project locally, follow these steps:
-Clone the repository:
-code
-Bash
-git clone https://github.com/waelbakir/phone-addiction-prediction.git
-cd phone-addiction-prediction
-Install the required dependencies:
-Make sure you have Python installed, then run:
-code
-Bash
+├── data/
+│   └── Smartphone_Usage_And_Addiction.csv   ← raw dataset
+├── notebooks/
+│   ├── 01_EDA.ipynb                          ← Exploratory Data Analysis
+│   ├── 02_Preprocessing_and_Balancing.ipynb  ← Cleaning, encoding, SMOTE
+│   └── 03_Modeling.ipynb                     ← Training, tuning, evaluation
+├── models/
+│   └── best_model.pkl                        ← saved best classifier (generated)
+├── outputs/                                  ← generated plots, CSVs, scalers
+├── app.py                                    ← Streamlit deployment app
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🚀 Quickstart
+
+### 1. Install dependencies
+```bash
 pip install -r requirements.txt
-Run the Jupyter Notebook:
-code
-Bash
-jupyter notebook
-Navigate to the notebooks/ folder and open addiction_analysis.ipynb.
-Contributors
-Wael Bakir
-Bakhom hany
+```
+
+### 2. Run the notebooks **in order**
+
+| Order | Notebook | Purpose |
+|-------|----------|---------|
+| 1️⃣ | `01_EDA.ipynb` | Understand the data — distributions, correlations, outliers |
+| 2️⃣ | `02_Preprocessing_and_Balancing.ipynb` | Clean → encode → scale → SMOTE → save splits |
+| 3️⃣ | `03_Modeling.ipynb` | Train 7 classifiers → tune top 2 → evaluate → save best model |
+
+### 3. Launch the Streamlit app
+```bash
+streamlit run app.py
+```
+
+---
+
+## 🔬 Pipeline Overview
+
+```
+Raw CSV
+  │
+  ▼
+01_EDA.ipynb
+  │  → target distribution, feature distributions, correlation heatmap, outlier summary
+  │
+  ▼
+02_Preprocessing_and_Balancing.ipynb
+  │  → drop leakage cols, impute, deduplicate
+  │  → ordinal + label + one-hot encoding
+  │  → IQR winsorization
+  │  → 70/15/15 stratified split
+  │  → StandardScaler (fit on train)
+  │  → SMOTE on training set
+  │  → saves: X_train.csv, X_val.csv, X_test.csv, scaler.pkl, feature_names.pkl
+  │
+  ▼
+03_Modeling.ipynb
+  │  → 5-fold CV baseline comparison (7 models)
+  │  → GridSearchCV tuning (Random Forest + XGBoost)
+  │  → validation set evaluation
+  │  → final test set evaluation
+  │  → saves: best_model.pkl, model_comparison.csv
+  │
+  ▼
+app.py  (Streamlit)
+  │  → loads scaler + model → user inputs → prediction + probability + tips
+```
+
+---
+
+## 📊 Models Compared
+
+| Model | Notes |
+|-------|-------|
+| Logistic Regression | Linear baseline |
+| Decision Tree | Interpretable, prone to overfitting |
+| **Random Forest** | Ensemble, robust, tuned with GridSearchCV |
+| Gradient Boosting | Sequential ensemble |
+| **XGBoost** | Boosted trees, tuned with GridSearchCV |
+| K-Nearest Neighbors | Distance-based |
+| SVM | Kernel-based |
+
+---
+
+## ⚖️ Class Balancing
+
+Three strategies are compared in Notebook 2:
+
+| Strategy | Description |
+|----------|-------------|
+| SMOTE | Synthetic over-sampling of minority class ✅ **default** |
+| Random Under-Sampling | Reduce majority class |
+| SMOTE + Tomek | Combined approach |
+
+---
+
+## 📦 Generated Artifacts
+
+| File | Description |
+|------|-------------|
+| `outputs/scaler.pkl` | Fitted StandardScaler |
+| `outputs/feature_names.pkl` | Ordered feature list |
+| `outputs/X_train.csv` | SMOTE-balanced training features |
+| `outputs/X_val.csv` | Validation features |
+| `outputs/X_test.csv` | Test features |
+| `models/best_model.pkl` | Best fitted classifier |
+| `outputs/model_comparison.csv` | All metrics table |
+| `outputs/0*_*.png` | All EDA & modeling plots |
+
+---
+
+## ⚠️ Disclaimer
+
+This project is for **educational purposes** (Data Mining coursework).  
+It does not constitute medical or psychological advice.
